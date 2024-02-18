@@ -16,7 +16,7 @@ To prevent any malicious insertion of access record, we also verify the amount o
 
 ## Read-write unit grouping
 
-The first thing to ensure data is consistent between different writes is to give each data an unique identifier, then group data chunks by the unique identifier. And finally, then sort them by order of access `rw_counter`.
+The first thing to ensure data is consistent between different writes is to give each data a unique identifier, then group data chunks by the unique identifier. And finally, then sort them by order of access `rw_counter`.
 
 Here are all kinds of data with their unique identifier:
 
@@ -39,9 +39,9 @@ Most tags also keep the previous value `*_prev` for convenience, which helps red
 
 ## Lazy initialization
 
-EVM's memory expands implicitly, for example, when the memory is empty and it enounters a `mload(32)`, EVM first expands to memory size to `64`, and then loads the bytes just initialized to push to the stack, which is always a `0`.
+EVM's memory expands implicitly, for example, when the memory is empty, and it encounters a `mload(32)`, EVM first expands to memory size to `64`, and then loads the bytes just initialized to push to the stack, which is always a `0`.
 
-The implicit expansion behavior makes even the simple `MLOAD` and `MSTORE` complicated in EVM circuit, so we have a trick to outsource the effort to State circuit by constraining the first record of each memory unit to be a write or have value `0`. It saves the variable amount of effort to expand memory and ignore those never used memory, only used memory addresses will be initlized with `0` so as lazy initialization.
+The implicit expansion behavior makes even the simple `MLOAD` and `MSTORE` complicated in EVM circuit, so we have a trick to outsource the effort to State circuit by constraining the first record of each memory unit to be a write or have value `0`. It saves the variable amount of effort to expand memory and ignore those never used memory, only used memory addresses will be initialized with `0` so as lazy initialization.
 
 > This concept is also used in another case: the opcode `SELFDESTRUCT` also has ability to update the variable amount of data. It resets the `balance`, `nonce`, `code_hash`, and every `storage_slot` even if it's not used in the step. So for each state under account, we can add a `revision_id` handle such case, see [Design Notes, Reversible Write Reversion Note2, SELFDESTRUCT](./reversible-write-reversion2.md#selfdestruct) for details.
 > ==TODO== Convert this into an issue for discussion
